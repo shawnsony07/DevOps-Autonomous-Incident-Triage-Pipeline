@@ -1,0 +1,44 @@
+:root {
+  --bg-color: #050505;
+  --panel-bg: #0f0f0f;
+  --border-color: #222222;
+  --text-primary: #e0e0e0;
+  --text-secondary: #888888;
+  
+  --accent-cyan: #00e5ff;
+  --accent-red: #ff3b3b;
+  --accent-green: #00e676;
+  --accent-yellow: #ffea00;
+  
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-sans: 'Inter', 'Space Grotesk', system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden; /* App handles its own scroll */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color); 
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444; 
+}

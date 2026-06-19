@@ -9,6 +9,7 @@ import 'dotenv/config';
 import express from 'express';
 import crypto from 'node:crypto';
 import { runTriagePipeline } from './src/orchestrator.js';
+import { pipelineEmitter } from './src/eventBus.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -114,6 +115,39 @@ app.post('/webhook', async (req, res) => {
   } catch (err) {
     console.error('[Webhook] ✗ Unhandled pipeline error:', err);
   }
+});
+
+// ── SSE Stream ───────────────────────────────────────────────────────────────
+app.get('/api/stream', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Access-Control-Allow-Origin': '*'
+  });
+
+  // Send an initial connected message
+  res.write(`data: ${JSON.stringify({ type: 'connected', message: 'SSE connection established' })}\n\n`);
+
+  const onEvent = (type, data) => {
+    res.write(`data: ${JSON.stringify({ type, data })}\n\n`);
+  };
+
+  // Bind to pipeline events
+  const events = ['pipeline:start', 'agent:start', 'agent:complete', 'agent:error', 'pipeline:complete', 'pipeline:error'];
+  
+  const handlers = {};
+  for (const eventName of events) {
+    handlers[eventName] = (data) => onEvent(eventName, data);
+    pipelineEmitter.on(eventName, handlers[eventName]);
+  }
+
+  // Handle client disconnect
+  req.on('close', () => {
+    for (const eventName of events) {
+      pipelineEmitter.off(eventName, handlers[eventName]);
+    }
+  });
 });
 
 // ── Health Check ─────────────────────────────────────────────────────────────

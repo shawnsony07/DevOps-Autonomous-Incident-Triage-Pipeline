@@ -47,7 +47,7 @@ const STACK_PATTERNS = [
  *   rawMessage: string
  * }}
  */
-export function parseLog(rawLog) {
+export function parseLog(rawLog, title = '') {
   if (!rawLog || typeof rawLog !== 'string') {
     console.warn('[LogParser] ⚠ Received empty or non-string log input');
     return {
@@ -55,10 +55,19 @@ export function parseLog(rawLog) {
       filePath: 'unknown',
       lineNumber: 0,
       rawMessage: rawLog ?? '',
+      severity: 'LOW'
     };
   }
 
   console.log('[LogParser] Analyzing log input (%d chars)…', rawLog.length);
+
+  const combinedText = `${title} ${rawLog}`.toUpperCase();
+  let severity = 'LOW';
+  if (combinedText.includes('CRITICAL') || combinedText.includes('URGENT') || combinedText.includes('FATAL')) {
+    severity = 'HIGH';
+  } else if (combinedText.includes('BUG') || combinedText.includes('ERROR') || combinedText.includes('EXCEPTION')) {
+    severity = 'MEDIUM';
+  }
 
   for (const pattern of STACK_PATTERNS) {
     // Reset regex state (global flag)
@@ -91,8 +100,9 @@ export function parseLog(rawLog) {
     console.log(`[LogParser]   errorType  = ${errorType}`);
     console.log(`[LogParser]   filePath   = ${filePath}`);
     console.log(`[LogParser]   lineNumber = ${lineNumber}`);
+    console.log(`[LogParser]   severity   = ${severity}`);
 
-    return { errorType, filePath, lineNumber, rawMessage };
+    return { errorType, filePath, lineNumber, rawMessage, severity };
   }
 
   // ── Fallback: nothing matched ────────────────────────────────────────────
@@ -108,5 +118,6 @@ export function parseLog(rawLog) {
     filePath: 'unknown',
     lineNumber: 0,
     rawMessage: fallbackErrorMatch ? fallbackErrorMatch[1]?.trim() ?? rawLog.slice(0, 200) : rawLog.slice(0, 200),
+    severity
   };
 }

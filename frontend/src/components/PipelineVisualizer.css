@@ -1,0 +1,89 @@
+.pipeline-visualizer {
+  margin-top: 16px;
+}
+
+.pipeline-track {
+  display: flex;
+  flex-direction: column;
+}
+
+.agent-node-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.agent-node {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.agent-node.status-running {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.1);
+}
+
+.agent-node.status-completed {
+  border-color: rgba(0, 230, 118, 0.3);
+}
+
+.agent-node.status-error {
+  border-color: rgba(255, 59, 59, 0.3);
+}
+
+.node-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.node-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.node-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.node-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.meta-running { color: var(--accent-cyan); }
+.meta-completed { color: var(--text-secondary); }
+.meta-error { color: var(--accent-red); }
+.meta-idle { color: var(--border-color); }
+
+.connector {
+  width: 2px;
+  height: 24px;
+  background-color: var(--border-color);
+  margin-left: 23px; /* Align with center of icon (12 + 12 - 1) */
+  position: relative;
+}
+
+.connector-fill {
+  width: 100%;
+  background-color: var(--accent-cyan);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.connector.status-completed .connector-fill {
+  background-color: var(--accent-green);
+}

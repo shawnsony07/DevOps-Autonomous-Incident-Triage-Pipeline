@@ -1,0 +1,49 @@
+.live-console {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-color);
+}
+
+.console-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: #1a1a1a;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.console-body {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.log-entry {
+  margin-bottom: 4px;
+  display: flex;
+  gap: 12px;
+  word-break: break-all;
+}
+
+.log-time {
+  color: #666;
+  white-space: nowrap;
+}
+
+.log-message {
+  flex: 1;
+}
+
+.log-info .log-message { color: var(--text-primary); }
+.log-success .log-message { color: var(--accent-green); }
+.log-error .log-message { color: var(--accent-red); }
+.log-system .log-message { color: var(--accent-cyan); }

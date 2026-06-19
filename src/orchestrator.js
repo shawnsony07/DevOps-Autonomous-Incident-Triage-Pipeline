@@ -9,6 +9,7 @@ import { parseLog } from './agents/logParser.js';
 import { retrieveCodeContext } from './agents/ragRetriever.js';
 import { generateFix } from './agents/codeRepair.js';
 import { applyPatchAndOpenPR } from './agents/gitBridge.js';
+import { pipelineEmitter } from './eventBus.js';
 
 /**
  * Execution context that flows through the pipeline, accumulating output
@@ -43,6 +44,8 @@ async function runAgent(agentName, agentFn, ctx, outputKey) {
   console.log(`[Orchestrator] ▶ Starting ${agentName}`);
   console.log(divider);
 
+  pipelineEmitter.emit('agent:start', { agentName, timestamp: new Date().toISOString() });
+
   const t0 = performance.now();
 
   try {
@@ -55,6 +58,7 @@ async function runAgent(agentName, agentFn, ctx, outputKey) {
     }
 
     console.log(`[Orchestrator] ✓ ${agentName} completed in ${elapsed}ms`);
+    pipelineEmitter.emit('agent:complete', { agentName, elapsed, result, timestamp: new Date().toISOString() });
     return result;
   } catch (err) {
     const elapsed = (performance.now() - t0).toFixed(1);
@@ -64,6 +68,7 @@ async function runAgent(agentName, agentFn, ctx, outputKey) {
     console.error(`[Orchestrator] ✗ ${agentName} FAILED after ${elapsed}ms`);
     console.error(`  └─ ${err.message}`);
 
+    pipelineEmitter.emit('agent:error', { agentName, error: err.message, elapsed, timestamp: new Date().toISOString() });
     throw err; // Re-throw to halt the pipeline
   }
 }
@@ -90,11 +95,13 @@ export async function runTriagePipeline(issuePayload) {
   console.log(`║  "${issuePayload.issueTitle.slice(0, 49).padEnd(51)}"║`);
   console.log('╚══════════════════════════════════════════════════════════════╝');
 
+  pipelineEmitter.emit('pipeline:start', { issuePayload, timestamp: new Date().toISOString() });
+
   try {
     // ── Agent 1: Log Parser ────────────────────────────────────────────────
     await runAgent(
       'Agent 1 — Log Parser',
-      () => parseLog(issuePayload.issueBody),
+      () => parseLog(issuePayload.issueBody, issuePayload.issueTitle),
       ctx,
       'parsedLog'
     );
@@ -148,6 +155,7 @@ export async function runTriagePipeline(issuePayload) {
     console.log(`  ├─ Fix PR:   ${ctx.pullRequest?.html_url ?? 'N/A'}`);
     console.log('  └─ Timings:', JSON.stringify(ctx.agentTimings));
 
+    pipelineEmitter.emit('pipeline:complete', { ctx, timestamp: new Date().toISOString() });
     return ctx;
   } catch (err) {
     console.error('\n╔══════════════════════════════════════════════════════════════╗');
@@ -157,6 +165,7 @@ export async function runTriagePipeline(issuePayload) {
     console.error('[Orchestrator] Errors collected:', JSON.stringify(ctx.errors, null, 2));
     console.error('[Orchestrator] Timings so far:', JSON.stringify(ctx.agentTimings));
 
+    pipelineEmitter.emit('pipeline:error', { error: err.message, ctx, timestamp: new Date().toISOString() });
     return ctx;
   }
 }

@@ -123,7 +123,10 @@ function readLocalFile(parsedLog) {
 
   // The filePath from the stack trace may be absolute or relative —
   // try several resolution strategies.
+  const relativeFilePath = parsedLog.filePath.replace(/^[\\\/]+/, '');
+
   const candidatePaths = [
+    path.resolve(workspacePath, relativeFilePath),
     path.resolve(workspacePath, parsedLog.filePath),
     path.resolve(workspacePath, path.basename(parsedLog.filePath)),
     path.resolve(parsedLog.filePath),

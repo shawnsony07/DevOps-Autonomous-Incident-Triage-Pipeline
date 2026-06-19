@@ -55,6 +55,8 @@ export async function applyPatchAndOpenPR(patchData) {
   }
 
   console.log(`[GitBridge] Target repo: ${owner}/${repo}`);
+  // GitHub API requires paths to NOT start with a slash
+  patchData.file_path = patchData.file_path.replace(/^\/+/, '');
   console.log(`[GitBridge] File to patch: ${patchData.file_path}`);
 
   // ── Step 1: Get the latest commit SHA on the base branch ────────────────

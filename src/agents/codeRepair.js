@@ -82,12 +82,12 @@ ${codeContext}
 
 Analyze the above and produce the JSON fix object according to the response schema.`;
 
-  console.log('[CodeRepair] Calling Gemini 3.1 Pro with JSON Schema mode…');
+  console.log('[CodeRepair] Calling Gemini 2.5 Flash with JSON Schema mode…');
   console.log(`[CodeRepair]   Error: ${parsedLog.errorType} in ${parsedLog.filePath}:${parsedLog.lineNumber}`);
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3.1-pro',
+      model: 'gemini-2.5-flash',
       contents: userMessage,
       config: {
         systemInstruction: SYSTEM_PROMPT,
