@@ -76,6 +76,10 @@ export function validateOrder(order) {
   if (!order.items || order.items.length === 0) {
     throw new Error('Order must contain at least one item');
   }
+  const calculatedTotal = calculateTotal(order.items);
+  if (order.totalAmount !== calculatedTotal) {
+    throw new Error('Order total amount mismatch with item sum');
+  }
 
   return true;
 }
