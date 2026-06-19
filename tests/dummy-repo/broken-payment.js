@@ -32,7 +32,7 @@ export async function processPayment(order) {
 
   // ❌ BUG: order.paymentMethod is undefined for guest users
   //    This line throws: TypeError: Cannot read properties of undefined (reading 'id')
-  const paymentMethodId = order.paymentMethod.id;
+  const paymentMethodId = order.paymentMethod ? order.paymentMethod.id : null;
 
   try {
     const charge = await stripe.charges.create({
