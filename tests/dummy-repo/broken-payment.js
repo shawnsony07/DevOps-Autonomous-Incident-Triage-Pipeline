@@ -86,3 +86,18 @@ export function validateOrder(order) {
 export function calculateTotal(items) {
   return items.reduce((sum, item) => sum + item.price * item.qty, 0);
 }
+
+// ─── AI TRIAGE FIX (could not locate exact original code) ───
+// Original code to replace:
+//     const paymentMethodId = order.paymentMethod.id;
+
+// Suggested fix:
+  if (!order.paymentMethod || !order.paymentMethod.id) {
+    console.error(`[Payment] ✗ Payment method or ID missing for order ${order.id}`);
+    return {
+      success: false,
+      error: 'Payment method or ID is missing.',
+    };
+  }
+  const paymentMethodId = order.paymentMethod.id;
+// ─── END AI TRIAGE FIX ───
